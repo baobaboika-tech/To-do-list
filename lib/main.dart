@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+
 void main() {
   runApp(MyApp());
 }
@@ -22,7 +23,7 @@ class _ModalListDemoState extends State<ModalListDemo> {
   List<String> items = [];
 
   void _showTextInputDialog() async {
-    TextEditingController _controller = TextEditingController();
+    TextEditingController controllers = TextEditingController();
 
     final result = await showDialog<String>(
       context: context,
@@ -30,7 +31,7 @@ class _ModalListDemoState extends State<ModalListDemo> {
         return AlertDialog(
           title: Text('Enter a value'),
           content: TextField(
-            controller: _controller,
+            controller: controllers,
             decoration: InputDecoration(hintText: 'Type something...'),
             autofocus: true,
           ),
@@ -43,7 +44,7 @@ class _ModalListDemoState extends State<ModalListDemo> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(_controller.text); // OK
+                Navigator.of(context).pop(controllers.text); // OK
               },
               child: Text('OK'),
             ),
