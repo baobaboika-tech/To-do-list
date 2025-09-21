@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:testmodal/database.dart';
+import 'package:testmodal/todo_item.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,15 +16,32 @@ class MyApp extends StatelessWidget {
 }
 
 class ModalListDemo extends StatefulWidget {
+
+  const ModalListDemo({super.key});
+
   @override
-  _ModalListDemoState createState() => _ModalListDemoState();
+  ModalListDemoState createState() => ModalListDemoState();
 }
 
-class _ModalListDemoState extends State<ModalListDemo> {
-  List<String> items = [];
+class ModalListDemoState extends State<ModalListDemo> {
+  List<Task> items = [];
+  DataBaseWorks dataBaseWorks = DataBaseWorks();
 
-  void _showTextInputDialog() async {
-    TextEditingController _controller = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    loadTasks();
+  }
+
+  Future<void> loadTasks() async {
+    final result = await dataBaseWorks.getTasks();
+    setState(() {
+      items = result;
+    });
+  }
+
+  void showTextInputDialog() async {
+    TextEditingController controllers = TextEditingController();
 
     final result = await showDialog<String>(
       context: context,
@@ -30,7 +49,7 @@ class _ModalListDemoState extends State<ModalListDemo> {
         return AlertDialog(
           title: Text('Enter a value'),
           content: TextField(
-            controller: _controller,
+            controller: controllers,
             decoration: InputDecoration(hintText: 'Type something...'),
             autofocus: true,
           ),
@@ -43,7 +62,7 @@ class _ModalListDemoState extends State<ModalListDemo> {
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(_controller.text); // OK
+                Navigator.of(context).pop(controllers.text); // OK
               },
               child: Text('OK'),
             ),
@@ -56,7 +75,7 @@ class _ModalListDemoState extends State<ModalListDemo> {
         .trim()
         .isNotEmpty) {
       setState(() {
-        items.add(result.trim());
+        items.add(Task(text: result.trim(), isDone: false));
       });
     }
   }
@@ -70,12 +89,13 @@ class _ModalListDemoState extends State<ModalListDemo> {
         itemBuilder: (context, index) {
           return ListTile(
             leading: Icon(Icons.note),
-            title: Text(items[index]),
+            trailing: items[index].isDone ? Icon(Icons.done) : Icon(Icons.square_outlined),
+            title: Text(items[index].text),
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _showTextInputDialog,
+        onPressed: showTextInputDialog,
         child: Icon(Icons.add),
       ),
     );
